@@ -14,7 +14,7 @@ app.use(express.json());
 // KẾT NỐI MONGODB ATLAS
 // ===============================
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, { dbName: "cloud_lab"})
   .then(() => {
     console.log("MongoDB Atlas connected successfully");
   })

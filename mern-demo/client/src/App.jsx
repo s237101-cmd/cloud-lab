@@ -12,7 +12,7 @@ function App() {
   // ===============================
   const getStudents = async () => {
     try {
-      const response = await fetch("/api/students");
+      const response = await fetch("http://localhost:5000/api/students");
 
       if (!response.ok) {
         throw new Error("Không thể lấy danh sách sinh viên");
@@ -46,7 +46,7 @@ function App() {
     }
 
     try {
-      const response = await fetch("/api/students", {
+      const response = await fetch("http://localhost:5000/api/students", {
         method: "POST",
 
         headers: {
@@ -81,7 +81,67 @@ function App() {
       alert("Thêm sinh viên thất bại!");
     }
   };
+const updateStudent = async (student) => {
+  const name = prompt("Nhập họ tên mới:", student.name);
+  const email = prompt("Nhập email mới:", student.email);
 
+  if (!name || !email) return;
+
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/students/${student._id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: student.studentId,
+          name: name,
+          email: email,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Cập nhật thất bại");
+    }
+
+    alert("Cập nhật sinh viên thành công!");
+    getStudents();
+  } catch (error) {
+    console.error("PUT ERROR:", error);
+    alert("Cập nhật sinh viên thất bại!");
+  }
+};
+const deleteStudent = async (id) => {
+  if (!window.confirm("Bạn có chắc muốn xóa sinh viên này không?")) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/students/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Xóa sinh viên thất bại");
+    }
+
+    alert("Xóa sinh viên thành công!");
+    getStudents();
+  } catch (error) {
+    console.error("DELETE ERROR:", error);
+    alert("Xóa sinh viên thất bại!");
+  }
+};
   return (
     <div
       style={{
@@ -196,6 +256,15 @@ function App() {
                 <td>{student.email}</td>
 
                 <td>{student._id}</td>
+                <td>
+                  <button onClick={() => updateStudent(student)}>
+                   Sửa
+                  </button>
+
+                  <button onClick={() => deleteStudent(student._id)}>
+                   Xóa
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
